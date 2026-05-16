@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: shopai-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app.main:app -w 2 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT
+    envVars:
+      - key: DATABASE_URL
+        value: postgresql://shopai_db_qol3_user:j0FjyTHVcOyAs9gsrItusSYiS53PqGTK@dpg-d82vrb5ckfvc7389ef3g-a.oregon-postgres.render.com/shopai_db_qol3
+      - key: SECRET_KEY
+        value: kawshar_shopai_super_secret_key_2024_production
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "10080"
+      - key: UPLOAD_DIR
+        value: uploads
+      - key: ANTHROPIC_API_KEY
+        value: your-anthropic-api-key-here
+      - key: FRONTEND_URL
+        value: https://your-frontend.vercel.app
