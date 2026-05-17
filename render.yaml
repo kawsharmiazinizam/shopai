@@ -1,22 +1,35 @@
-services:
+﻿services:
   - type: web
     name: shopai-backend
-    runtime: python
+    runtime: docker
     rootDir: backend
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app.main:app -w 2 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: DATABASE_URL
-        value: postgresql://shopai_db_qol3_user:j0FjyTHVcOyAs9gsrItusSYiS53PqGTK@dpg-d82vrb5ckfvc7389ef3g-a.oregon-postgres.render.com/shopai_db_qol3
+        sync: false
       - key: SECRET_KEY
-        value: kawshar_shopai_super_secret_key_2024_production
+        sync: false
       - key: ALGORITHM
         value: HS256
       - key: ACCESS_TOKEN_EXPIRE_MINUTES
-        value: "10080"
+        value: 10080
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: FRONTEND_URL
+        value: https://shopai-frontend.onrender.com
       - key: UPLOAD_DIR
         value: uploads
-      - key: ANTHROPIC_API_KEY
-        value: your-anthropic-api-key-here
-      - key: FRONTEND_URL
-        value: https://your-frontend.vercel.app
+
+  - type: web
+    name: shopai-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: CI=false npm install && npm run build
+    staticPublishPath: ./build
+    envVars:
+      - key: REACT_APP_API_URL
+        value: https://shopai-backend-pwk8.onrender.com
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
